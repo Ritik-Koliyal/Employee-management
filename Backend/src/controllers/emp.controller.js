@@ -1,6 +1,8 @@
 const Employee = require("../models/employee.model.js");
 const bcrypt = require("bcryptjs");
 const generateEmployeeID = require("../utills/generateEmployeeID.js");
+const { generateAccessToken } = require("../utills/JWT/token.js");
+const { generateRefreshToken } = require("../utills/JWT/token.js");
 
 const generatePassword = (firstName, dob) => {
   const date = new Date(dob);
@@ -10,7 +12,6 @@ const generatePassword = (firstName, dob) => {
 };
 
 const createEmployee = async (req, res) => {
-  console.log("req body", req.body);
   try {
     const {
       firstName,
@@ -60,13 +61,10 @@ const createEmployee = async (req, res) => {
 
     // Generate Employee ID
     const empID = await generateEmployeeID();
-
     // Generate Default Password
     const plainPassword = generatePassword(firstName, dob);
-
     // Hash Password
     const hashedPassword = await bcrypt.hash(plainPassword, 10);
-
     // Create Employee
     const employee = await Employee.create({
       empID,
@@ -105,6 +103,77 @@ const createEmployee = async (req, res) => {
   }
 };
 
+const login = async (req, res) => {
+  try {
+    const { empID, password } = req.body;
+
+    console.log("req body", req.body);
+
+    if (!empID || !password) {
+      return res.status(400).json({
+        success: false,
+        message: "Missing required Fields",
+      });
+    }
+
+    const employee = await Employee.findOne({
+      empID,
+      isDeleted: false,
+    }).select("password + refreshToken");
+
+    if (!employee) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const isMatch = await bcrypt.compare(password, employee.password);
+
+    if (!isMatch) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid credentials",
+      });
+    }
+
+    const accessToken = await generateAccessToken(employee);
+    const refreshToken = await generateRefreshToken(employee);
+
+    employee.refreshToken = refreshToken;
+    employee.lastLogin = new Date();
+    await employee.save();
+
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Login successful",
+      data: {
+        employee: {
+          _id: employee._id,
+          empID: employee.empID,
+          firstName: employee.firstName,
+          role: employee.role,
+        },
+        accessToken,
+      },
+    });
+  } catch (error) {
+    console.error("error while login", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
 module.exports = {
   createEmployee,
+  login,
 };

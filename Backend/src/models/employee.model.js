@@ -93,6 +93,17 @@ const EmployeeSchema = new mongoose.Schema(
       required: true,
     },
 
+    refreshToken: {
+      type: String,
+      default: null,
+      select: false,
+    },
+
+    lastLogin: {
+      type: Date,
+      default: null,
+    },
+
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Employee",
