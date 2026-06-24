@@ -3,7 +3,9 @@ const bcrypt = require("bcryptjs");
 const generateEmployeeID = require("../utills/generateEmployeeID.js");
 const { generateAccessToken } = require("../utills/JWT/token.js");
 const { generateRefreshToken } = require("../utills/JWT/token.js");
-
+const { generateEmailVerificationToken } = require("../utills/JWT/token.js");
+const { sendEmail } = require("../services/email.service.js");
+const { verificationTemplate } = require("../utills/email/emailTemplates.js");
 const generatePassword = (firstName, dob) => {
   const date = new Date(dob);
   const day = String(date.getDate()).padStart(2, "0");
@@ -83,6 +85,14 @@ const createEmployee = async (req, res) => {
       createdBy: req.user?._id || null,
     });
 
+    const verificationToken = generateEmailVerificationToken(employee);
+
+    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
+
+    const html = verificationTemplate(employee.firstName, verificationUrl);
+
+    await sendEmail(employee.email, "Verify Your Email", html);
+
     return res.status(201).json({
       success: true,
       message: "Employee created successfully",
@@ -103,12 +113,41 @@ const createEmployee = async (req, res) => {
   }
 };
 
+// verify email is valid or not
+const verifyEmail = async (req, res) => {
+  try {
+    const { token } = req.params;
+
+    const decoded = jwt.verify(token, process.env.EMAIL_VERIFY_SECRET);
+
+    const employee = await Employee.findById(decoded.employeeId);
+
+    if (!employee) {
+      return res.status(404).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    employee.emailVerified = true;
+
+    await employee.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Email verified successfully",
+    });
+  } catch (error) {
+    return res.status(400).json({
+      success: false,
+      message: "Invalid or expired verification link",
+    });
+  }
+};
+
 const login = async (req, res) => {
   try {
     const { empID, password } = req.body;
-
-    console.log("req body", req.body);
-
     if (!empID || !password) {
       return res.status(400).json({
         success: false,
@@ -127,9 +166,7 @@ const login = async (req, res) => {
         message: "Invalid credentials",
       });
     }
-
     const isMatch = await bcrypt.compare(password, employee.password);
-
     if (!isMatch) {
       return res.status(401).json({
         success: false,
@@ -176,4 +213,5 @@ const login = async (req, res) => {
 module.exports = {
   createEmployee,
   login,
+  verifyEmail,
 };

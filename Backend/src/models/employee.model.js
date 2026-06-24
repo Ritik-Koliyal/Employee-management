@@ -24,6 +24,11 @@ const EmployeeSchema = new mongoose.Schema(
       unique: true,
     },
 
+    emailVerified: {
+      type: Boolean,
+      default: false,
+    },
+
     fatherName: {
       type: String,
       required: true,

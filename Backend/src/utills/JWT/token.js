@@ -22,7 +22,20 @@ const generateRefreshToken = async (employee) => {
   );
 };
 
+const generateEmailVerificationToken = (employee) => {
+  return jwt.sign(
+    {
+      employeeId: employee._id,
+    },
+    process.env.EMAIL_VERIFY_SECRET,
+    {
+      expiresIn: "24h",
+    },
+  );
+};
+
 module.exports = {
   generateAccessToken,
   generateRefreshToken,
+  generateEmailVerificationToken,
 };
