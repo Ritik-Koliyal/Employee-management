@@ -6,11 +6,97 @@ const { generateRefreshToken } = require("../utills/JWT/token.js");
 const { generateEmailVerificationToken } = require("../utills/JWT/token.js");
 const { sendEmail } = require("../services/email.service.js");
 const { verificationTemplate } = require("../utills/email/emailTemplates.js");
+const EmailOtp = require("../models/emailOtp.model.js");
+
 const generatePassword = (firstName, dob) => {
   const date = new Date(dob);
   const day = String(date.getDate()).padStart(2, "0");
   const year = String(date.getFullYear()).slice(-2);
   return `${firstName.toLowerCase()}${day}${year}`;
+};
+
+const sendOtp = async (req, res) => {
+  try {
+    const { email } = req.body;
+    console.log("email", email);
+
+    if (!email) {
+      return res.status(400).json({
+        success: false,
+        message: "Email is required...",
+      });
+    }
+
+    const existingEmail = await Employee.findOne({ email, isDeleted: false });
+    console.log("existing email", existingEmail);
+
+    if (existingEmail) {
+      return res.status(400).json({
+        success: false,
+        message: "Email Already Exist...",
+      });
+    }
+
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+
+    await EmailOtp.findOneAndUpdate(
+      { email },
+      { otp, expiresAt: Date.now() + 5 * 60 * 1000 },
+      {
+        upsert: true,
+        new: true,
+      },
+    );
+
+    await sendEmail(email, "OTP FOR MY APP", verificationTemplate(otp));
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP sent successfully",
+    });
+  } catch (error) {
+    console.error("error while sending otp", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+      error: error,
+    });
+  }
+};
+
+const verifyOtp = async (req, res) => {
+  try {
+    const { email, otp } = req.body;
+    if (!email || !otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid Cred..",
+      });
+    }
+
+    const otpRecord = await EmailOtp.findOne({ email });
+
+    if (otpRecord.expiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired",
+      });
+    }
+
+    if (otpRecord.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP verified",
+    });
+  } catch (error) {
+    console.error("error", error);
+  }
 };
 
 const createEmployee = async (req, res) => {
@@ -85,14 +171,6 @@ const createEmployee = async (req, res) => {
       createdBy: req.user?._id || null,
     });
 
-    const verificationToken = generateEmailVerificationToken(employee);
-
-    const verificationUrl = `${process.env.FRONTEND_URL}/verify-email/${verificationToken}`;
-
-    const html = verificationTemplate(employee.firstName, verificationUrl);
-
-    await sendEmail(employee.email, "Verify Your Email", html);
-
     return res.status(201).json({
       success: true,
       message: "Employee created successfully",
@@ -128,6 +206,25 @@ const verifyEmail = async (req, res) => {
         message: "Employee not found",
       });
     }
+
+    if (otpRecord.expiresAt < new Date()) {
+      return res.status(400).json({
+        success: false,
+        message: "OTP expired",
+      });
+    }
+
+    if (otpRecord.otp !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: "Invalid OTP",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: "OTP verified",
+    });
 
     employee.emailVerified = true;
 
@@ -214,4 +311,6 @@ module.exports = {
   createEmployee,
   login,
   verifyEmail,
+  sendOtp,
+  verifyOtp,
 };

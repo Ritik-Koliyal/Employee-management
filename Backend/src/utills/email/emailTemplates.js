@@ -1,11 +1,9 @@
-const verificationTemplate = (firstName, url) => {
+const verificationTemplate = (otp) => {
   return `
-    <h2>Hello ${firstName}</h2>
-    <p>Click below to verify your email in our system.</p>
+    <h2>Hello user</h2>
+    <p>Code for varification.</p>
+    ${otp}
 
-    <a href="${url}">
-      Verify Email
-    </a>
   `;
 };
 

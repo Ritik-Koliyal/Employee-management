@@ -3,12 +3,15 @@ const {
   createEmployee,
   login,
   verifyEmail,
+  sendOtp,
+  verifyOtp,
 } = require("../controllers/emp.controller");
 const auth = require("../middleware/auth.middleware.js");
 const router = express.Router();
 
 router.post("/create", auth, createEmployee);
 router.post("/login", login);
-router.get("/verify-email/:token", verifyEmail);
+router.post("/send_otp", sendOtp);
+router.post("/verify-otp", verifyOtp);
 
 module.exports = router;
