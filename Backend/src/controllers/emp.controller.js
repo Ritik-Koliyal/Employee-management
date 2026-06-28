@@ -1,102 +1,20 @@
 const Employee = require("../models/employee.model.js");
 const bcrypt = require("bcryptjs");
 const generateEmployeeID = require("../utills/generateEmployeeID.js");
-const { generateAccessToken } = require("../utills/JWT/token.js");
+const {
+  generateAccessToken,
+  verifyRefreshToken,
+} = require("../utills/JWT/token.js");
 const { generateRefreshToken } = require("../utills/JWT/token.js");
-const { generateEmailVerificationToken } = require("../utills/JWT/token.js");
-const { sendEmail } = require("../services/email.service.js");
-const { verificationTemplate } = require("../utills/email/emailTemplates.js");
-const EmailOtp = require("../models/emailOtp.model.js");
+const { OAuth2Client } = require("google-auth-library");
+const { loginUser } = require("../services/auth.service.js");
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 const generatePassword = (firstName, dob) => {
   const date = new Date(dob);
   const day = String(date.getDate()).padStart(2, "0");
   const year = String(date.getFullYear()).slice(-2);
   return `${firstName.toLowerCase()}${day}${year}`;
-};
-
-const sendOtp = async (req, res) => {
-  try {
-    const { email } = req.body;
-    console.log("email", email);
-
-    if (!email) {
-      return res.status(400).json({
-        success: false,
-        message: "Email is required...",
-      });
-    }
-
-    const existingEmail = await Employee.findOne({ email, isDeleted: false });
-    console.log("existing email", existingEmail);
-
-    if (existingEmail) {
-      return res.status(400).json({
-        success: false,
-        message: "Email Already Exist...",
-      });
-    }
-
-    const otp = Math.floor(100000 + Math.random() * 900000).toString();
-
-    await EmailOtp.findOneAndUpdate(
-      { email },
-      { otp, expiresAt: Date.now() + 5 * 60 * 1000 },
-      {
-        upsert: true,
-        new: true,
-      },
-    );
-
-    await sendEmail(email, "OTP FOR MY APP", verificationTemplate(otp));
-
-    return res.status(200).json({
-      success: true,
-      message: "OTP sent successfully",
-    });
-  } catch (error) {
-    console.error("error while sending otp", error);
-    return res.status(500).json({
-      success: false,
-      message: "Internal server error",
-      error: error,
-    });
-  }
-};
-
-const verifyOtp = async (req, res) => {
-  try {
-    const { email, otp } = req.body;
-    if (!email || !otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid Cred..",
-      });
-    }
-
-    const otpRecord = await EmailOtp.findOne({ email });
-
-    if (otpRecord.expiresAt < new Date()) {
-      return res.status(400).json({
-        success: false,
-        message: "OTP expired",
-      });
-    }
-
-    if (otpRecord.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid OTP",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "OTP verified",
-    });
-  } catch (error) {
-    console.error("error", error);
-  }
 };
 
 const createEmployee = async (req, res) => {
@@ -191,57 +109,6 @@ const createEmployee = async (req, res) => {
   }
 };
 
-// verify email is valid or not
-const verifyEmail = async (req, res) => {
-  try {
-    const { token } = req.params;
-
-    const decoded = jwt.verify(token, process.env.EMAIL_VERIFY_SECRET);
-
-    const employee = await Employee.findById(decoded.employeeId);
-
-    if (!employee) {
-      return res.status(404).json({
-        success: false,
-        message: "Employee not found",
-      });
-    }
-
-    if (otpRecord.expiresAt < new Date()) {
-      return res.status(400).json({
-        success: false,
-        message: "OTP expired",
-      });
-    }
-
-    if (otpRecord.otp !== otp) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid OTP",
-      });
-    }
-
-    return res.status(200).json({
-      success: true,
-      message: "OTP verified",
-    });
-
-    employee.emailVerified = true;
-
-    await employee.save();
-
-    return res.status(200).json({
-      success: true,
-      message: "Email verified successfully",
-    });
-  } catch (error) {
-    return res.status(400).json({
-      success: false,
-      message: "Invalid or expired verification link",
-    });
-  }
-};
-
 const login = async (req, res) => {
   try {
     const { empID, password } = req.body;
@@ -271,23 +138,118 @@ const login = async (req, res) => {
       });
     }
 
-    const accessToken = await generateAccessToken(employee);
-    const refreshToken = await generateRefreshToken(employee);
-
-    employee.refreshToken = refreshToken;
-    employee.lastLogin = new Date();
-    await employee.save();
-
-    res.cookie("refreshToken", refreshToken, {
-      httpOnly: true,
-      secure: false,
-      sameSite: "strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-    });
+    const data = await loginUser(employee, res);
 
     return res.status(200).json({
       success: true,
-      message: "Login successful",
+      message: "Login Successfull..",
+      data,
+    });
+  } catch (error) {
+    console.error("error while login", error);
+    return res.status(500).json({
+      success: false,
+      message: "Internal server error",
+    });
+  }
+};
+
+const googleLogin = async (req, res) => {
+  try {
+    const { token } = req.body;
+
+    const ticket = await client.verifyIdToken({
+      idToken: token,
+      audience: process.env.GOOGLE_CLIENT_ID,
+    });
+
+    console.log("tickets", ticket);
+
+    const payload = ticket.getPayload();
+    console.log("payload from the google", payload);
+
+    const employee = await Employee.findOne({
+      email: payload.email,
+      isDeleted: false,
+    }).select("+refreshToken");
+
+    console.log("employee", employee);
+
+    if (!employee) {
+      return res.status(401).json({
+        success: false,
+        message: "Employee is not registered.",
+      });
+    }
+
+    if (!employee.googleId) {
+      employee.googleId = payload.sub;
+      employee.profilePicture = payload.picture;
+      employee.emailVerified = payload.email_verified;
+
+      if (!employee.authProvider.includes("google")) {
+        employee.authProvider.push("google");
+      }
+      await employee.save();
+    }
+    if (employee.googleId !== payload.sub) {
+      return res.status(401).json({
+        success: false,
+        message: "Google account mismatch.",
+      });
+    }
+    const data = await loginUser(employee, res);
+
+    return res.status(200).json({
+      success: true,
+      message: "Login Successfull..",
+      data,
+    });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({
+      success: false,
+      message: "Internal Server error",
+    });
+  }
+};
+
+const refreshAccessToken = async (req, res) => {
+  try {
+    const refreshToken = req.cookies.refreshToken;
+    console.log("refresh token console", refreshToken);
+
+    if (!refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Refresh token missing",
+      });
+    }
+
+    const decoded = verifyRefreshToken(refreshToken);
+    const employee = await Employee.findById(decoded._id).select(
+      "+refreshToken",
+    );
+
+    if (!employee) {
+      return res.status(401).json({
+        success: false,
+        message: "Employee not found",
+      });
+    }
+
+    if (employee.refreshToken !== refreshToken) {
+      return res.status(401).json({
+        success: false,
+        message: "Invalid refresh token",
+      });
+    }
+
+    const accessToken = await generateAccessToken(employee);
+
+    return res.status(200).json({
+      success: true,
+      message: "Access token generated",
       data: {
         employee: {
           _id: employee._id,
@@ -299,10 +261,42 @@ const login = async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("error while login", error);
+    console.log(error);
+
+    return res.status(401).json({
+      success: false,
+      message: "Invalid refresh token",
+    });
+  }
+};
+
+const getProfile = async (req, res) => {
+  const employee = await Employee.findById(req.user._id).select(
+    "-password -refreshToken",
+  );
+
+  return res.json({
+    success: true,
+    employee,
+  });
+};
+
+const logout = async (req, res) => {
+  try {
+    res.clearCookie("refreshToken", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "strict",
+    });
+
+    return res.status(200).json({
+      success: true,
+      message: "Logged out successfully",
+    });
+  } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Internal server error",
+      message: "Logout failed",
     });
   }
 };
@@ -310,7 +304,8 @@ const login = async (req, res) => {
 module.exports = {
   createEmployee,
   login,
-  verifyEmail,
-  sendOtp,
-  verifyOtp,
+  googleLogin,
+  refreshAccessToken,
+  getProfile,
+  logout,
 };
