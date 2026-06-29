@@ -4,7 +4,6 @@ import { GoogleLogin } from "@react-oauth/google";
 import { useAppDispatch } from "../hooks/redux";
 import { loginSuccess, logout } from "../feature/auth/authSlice";
 import api from "../services/api";
-import { store } from "../app/store";
 
 const Login = () => {
   const dispatch = useAppDispatch();
@@ -37,17 +36,7 @@ const Login = () => {
     }
   }
 
-const handleLogout = async () => {
-  try {
-    await api.post("/logout");
 
-   dispatch(logout());
-
-    console.log("Logged out");
-  } catch (error) {
-    console.error(error);
-  }
-};
 
 
   return (

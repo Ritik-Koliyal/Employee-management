@@ -1,5 +1,5 @@
 import api from "./api";
-import { setAccessToken, logout, setEmployee } from "../feature/auth/authSlice";
+import { setAccessToken, logout, setEmployee, authFinished } from "../feature/auth/authSlice";
 import { store } from "../app/store";
 
 
@@ -20,4 +20,12 @@ export const initializeAuth = async () => {
     store.dispatch(logout());
     return false;
   }
+
+  finally {
+
+    store.dispatch(authFinished());
+
+
+  }
+
 };
