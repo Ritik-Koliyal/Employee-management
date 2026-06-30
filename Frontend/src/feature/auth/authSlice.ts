@@ -19,7 +19,7 @@ const initialState: AuthState = {
   employee: null,
   accessToken: null,
   isAuthenticated: false,
-  isLoading: true
+  isLoading: false
 };
 
 const authSlice = createSlice({

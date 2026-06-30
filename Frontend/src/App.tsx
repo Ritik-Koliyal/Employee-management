@@ -11,9 +11,14 @@ function App() {
 
   let initialized = false
   useEffect(() => {
-    if (initialized) return;
-    initializeAuth();
-    initialized = true
+    console.log(window.location.pathname, 'path')
+
+    if (window.location.pathname !== '/login') {
+      if (initialized) return;
+      initializeAuth();
+      initialized = true
+    }
+
   }, []);
 
   return (
