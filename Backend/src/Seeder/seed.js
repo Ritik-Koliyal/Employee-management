@@ -48,26 +48,26 @@ async function seed() {
     // Create Counter
     await Counter.create({
       name: "employee",
-      seq: 1, // kyunki niche EMP001 create kar rahe ho
+      seq: 1,
     });
 
     console.log("Counter Created");
 
     // Create Employee
     const employee = await Employee.create({
-      empID: "EMP001",
+      empID: "12345",
 
       firstName: "Ritik",
 
       lastName: "Koliyal",
 
-      email: "ritik@gmail.com",
+      email: "koliyalritik50@gmail.com",
 
       fatherName: "ABC",
 
       dob: new Date("2000-07-15"),
 
-      password: "dummy-password", // agar required hai
+      password: "12345",
 
       phoneNumber: 9876543210,
 

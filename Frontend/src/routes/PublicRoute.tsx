@@ -11,7 +11,7 @@ const PublicRoute = () => {
   }
 
   return isAuthenticated ? (
-    <Navigate to="/dashboard" replace />
+    <Navigate to="/" replace />
   ) : (
     <Outlet />
   );

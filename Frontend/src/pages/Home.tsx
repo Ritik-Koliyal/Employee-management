@@ -1,15 +1,18 @@
 import { useDispatch } from "react-redux";
 import api from "../services/api";
 import { logout } from "../feature/auth/authSlice";
+import { useNavigate } from "react-router-dom";
 
 
 const Home = () => {
   const dispatch = useDispatch()
+  const navigate = useNavigate()
   const handleLogout = async () => {
   try {
     await api.post("/logout");
 
    dispatch(logout());
+   navigate('/login')
 
     console.log("Logged out");
   } catch (error) {
@@ -19,8 +22,8 @@ const Home = () => {
   return (
     <div>
       Home Dashboard
-      
-      <button onClick={handleLogout}></button>
+      <hr />
+      <button style={{background:"red", color:"white", padding:"6px"}} onClick={handleLogout}>Logout</button>
 
 
     </div>

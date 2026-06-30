@@ -9,31 +9,31 @@ import Home from './pages/Home'
 import { BrowserRouter } from 'react-router-dom'
 function App() {
 
-    let initialized = false
-    useEffect(() => {
-      if (initialized) return;
-        initializeAuth();
-        initialized = true
-    }, []);
+  let initialized = false
+  useEffect(() => {
+    if (initialized) return;
+    initializeAuth();
+    initialized = true
+  }, []);
 
   return (
-   <>
-     return (
+    <>
+
       <BrowserRouter>
-    <Routes>
+        <Routes>
 
-      <Route element={<PublicRoute />}>
-        <Route path="/login" element={<Login />} />
-      </Route>
+          <Route element={<PublicRoute />}>
+            <Route path="/login" element={<Login />} />
+          </Route>
 
-      <Route element={<ProtectedRoute />}>
-        <Route path="/" element={<Home />} />
-      </Route>
+          <Route element={<ProtectedRoute />}>
+            <Route path="/" element={<Home />} />
+          </Route>
 
-    </Routes>
-    </BrowserRouter>
-  );
-   </>
+        </Routes>
+      </BrowserRouter>
+
+    </>
   )
 }
 

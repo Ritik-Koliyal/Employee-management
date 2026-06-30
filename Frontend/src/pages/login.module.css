@@ -1,5 +1,180 @@
 .loginContainer {
   height: 100vh;
-  width: 100vw;
-  background-color: aqua;
+  overflow: hidden;
+  background: #fff;
+}
+
+.loginContainer :global(.row) {
+  height: 100%;
+}
+
+/* LEFT */
+
+.formContainer {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.formWrapper {
+  width: 100%;
+  max-width: 380px;
+}
+
+.logo {
+  font-size: 34px;
+  color: #6C4CF1;
+  margin-bottom: 35px;
+}
+
+.heading {
+  font-size: 40px;
+  font-weight: 700;
+  color: #1c1c1c;
+}
+
+.subHeading {
+  margin-top: 10px;
+  margin-bottom: 35px;
+  color: #777;
+  font-size: 15px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  margin: 28px 0;
+}
+
+.divider::before,
+.divider::after {
+  content: "";
+  flex: 1;
+  border-top: 1px solid #ececec;
+}
+
+.divider span {
+  padding: 0 15px;
+  color: #999;
+  font-size: 13px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.input {
+  height: 52px;
+  border-radius: 30px;
+  padding-left: 22px;
+  border: 1px solid #e3e3e3;
+  box-shadow: none !important;
+}
+
+.input:focus {
+  border-color: #6C4CF1;
+}
+
+.options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 18px 0 28px;
+  font-size: 14px;
+}
+
+.options a {
+  text-decoration: none;
+  color: #6C4CF1;
+  font-weight: 600;
+}
+
+.loginBtn {
+  width: 100%;
+  height: 52px;
+  border: none;
+  border-radius: 30px;
+  background: linear-gradient(90deg, #f14c4c, #f43737);
+  color: white;
+  font-weight: 600;
+  transition: .3s;
+}
+
+.loginBtn:hover {
+  transform: translateY(-2px);
+}
+
+.footerText {
+  margin-top: 35px;
+  text-align: center;
+  color: #777;
+}
+
+.footerText a {
+  color: #6C4CF1;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+/* RIGHT */
+
+.imageContainer {
+  height: 100%;
+}
+
+.imageContainer img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Mobile */
+
+@media (max-width:992px) {
+
+  .loginContainer {
+    overflow: auto;
+    height: auto;
+    min-height: 100vh;
+  }
+
+  .imageContainer {
+    display: none;
+  }
+
+  .formContainer {
+    min-height: 100vh;
+    padding: 30px;
+  }
+}
+
+.passwordWrapper {
+  position: relative;
+}
+
+.eyeButton {
+  position: absolute;
+  top: 50%;
+  right: 18px;
+  transform: translateY(-50%);
+  border: none;
+  background: transparent;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #888;
+}
+
+.eyeButton:hover {
+  color: #6C4CF1;
+}
+
+.eyeButton:focus {
+  outline: none;
 }
