@@ -16,11 +16,16 @@
   align-items: center;
   justify-content: center;
   padding: 40px;
+
 }
 
 .formWrapper {
   width: 100%;
-  max-width: 380px;
+  max-width: 440px;
+  box-shadow:
+    0 4px 6px rgba(0, 0, 0, 0.1),
+    0 10px 20px rgba(0, 0, 0, 0.08);
+  padding: 0 4rem;
 }
 
 .logo {
@@ -68,7 +73,7 @@
 }
 
 .input {
-  height: 52px;
+  height: 42px;
   border-radius: 30px;
   padding-left: 22px;
   border: 1px solid #e3e3e3;

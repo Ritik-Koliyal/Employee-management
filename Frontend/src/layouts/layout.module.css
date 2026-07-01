@@ -1,0 +1,370 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+  background: #f5f6fa;
+}
+
+/* ===== Sidebar (shared styles used by both desktop + mobile wrappers) ===== */
+.sidebar {
+  width: 250px;
+  height: 100%;
+  background: #ffffff;
+  border-right: 1px solid #eef0f4;
+  display: flex;
+  flex-direction: column;
+  padding: 20px 16px;
+  overflow-y: auto;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 20px;
+}
+
+.brandIcon {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: #2563eb;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+
+.brandName {
+  font-weight: 700;
+  font-size: 18px;
+  color: #101828;
+}
+
+.contextCard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8f9fc;
+  border-radius: 12px;
+  padding: 12px;
+  margin: 0 4px 16px;
+  color: #475467;
+  font-size: 13px;
+}
+
+.contextTitle {
+  font-weight: 600;
+  color: #101828;
+  font-size: 13px;
+}
+
+.contextSub {
+  font-size: 11px;
+  color: #98a2b3;
+}
+
+.nav {
+  flex: 1;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.navSection {
+  margin-top: 18px;
+}
+
+.navSectionLabel {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  color: #98a2b3;
+  padding: 0 12px;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.navLink {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  color: #475467;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.navLink i {
+  font-size: 16px;
+  width: 18px;
+}
+
+.navLink:hover {
+  background: #f2f4f7;
+  color: #101828;
+}
+
+.navLinkActive {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+.navLinkActive:hover {
+  background: #2563eb;
+  color: #ffffff;
+}
+
+/* Profile pinned at sidebar bottom */
+.profile {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #eef0f4;
+  margin-top: 12px;
+  cursor: pointer;
+}
+
+.profile:hover {
+  background: #f8f9fc;
+}
+
+.profileAvatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profileInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.profileName {
+  font-size: 13px;
+  font-weight: 600;
+  color: #101828;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profileRole {
+  font-size: 11px;
+  color: #98a2b3;
+}
+
+/* Desktop sidebar wrapper */
+.sidebarDesktop {
+  display: block;
+}
+
+/* Mobile sidebar wrapper (off-canvas) */
+.sidebarMobile {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 1050;
+  transform: translateX(-100%);
+  transition: transform 0.25s ease;
+  display: none;
+}
+
+.sidebarMobileOpen {
+  transform: translateX(0);
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(16, 24, 40, 0.4);
+  z-index: 1040;
+}
+
+/* ===== Right section / Header ===== */
+.rightSection {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  flex-shrink: 0;
+
+  height: 70px;
+
+  display: flex;
+  align-items: center;
+
+  background: #fff;
+  border-bottom: 1px solid #eef0f4;
+
+  padding: 0 24px;
+
+  z-index: 10;
+}
+
+.headerLeft {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.headerTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: #101828;
+  margin: 0;
+}
+
+.searchWrap {
+  flex: 1;
+  max-width: 420px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f8f9fc;
+  border-radius: 10px;
+  padding: 10px 14px;
+  color: #98a2b3;
+}
+
+.searchInput {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  font-size: 14px;
+  color: #101828;
+}
+
+.headerRight {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.iconBtn,
+.iconBtnDark {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  border: 1px solid #eef0f4;
+  background: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475467;
+  font-size: 16px;
+}
+
+.iconBtnDark {
+  background: #101828;
+  color: #fff;
+  border: none;
+}
+
+.flagBtn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid #eef0f4;
+  background: #fff;
+  color: #475467;
+  font-size: 13px;
+}
+
+/* ===== Main content ===== */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 24px;
+  min-height: 0;
+}
+
+/* ===== Responsive breakpoints ===== */
+@media (min-width: 993px) {
+  .sidebarMobile {
+    display: none !important;
+  }
+}
+
+@media (max-width: 992px) {
+  .sidebarDesktop {
+    display: none;
+  }
+
+  .sidebarMobile {
+    display: block;
+    width: 250px;
+  }
+
+  .searchWrap {
+    max-width: 260px;
+  }
+}
+
+@media (max-width: 640px) {
+  .header {
+    padding: 0 12px;
+    gap: 10px;
+  }
+
+  .headerTitle {
+    display: none;
+  }
+
+  .searchWrap {
+    max-width: none;
+  }
+
+  .headerRight {
+    gap: 6px;
+  }
+
+  .flagBtn span {
+    display: none;
+  }
+
+  .main {
+    padding: 16px;
+  }
+}
+
+.thinScrollbar {
+  scrollbar-color: #ffffff transparent;
+}
+
+/* .thinScrollbar::-webkit-scrollbar {
+  width: 2px;
+  height: 2px;
+}
+
+.thinScrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.thinScrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 999px;
+}
+
+.thinScrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+} */
