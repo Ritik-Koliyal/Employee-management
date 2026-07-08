@@ -17,7 +17,11 @@ const navSections = [
       { to: "/accounts", icon: "bi-wallet2", label: "Accounts" },
       { to: "/sales", icon: "bi-grid", label: "Sales" },
       { to: "/purchases", icon: "bi-bag", label: "Purchases" },
-      { to: "/payment-method", icon: "bi-credit-card", label: "Payment Method" },
+      {
+        to: "/payment-method",
+        icon: "bi-credit-card",
+        label: "Payment Method",
+      },
     ],
   },
   {
@@ -29,21 +33,13 @@ const navSections = [
   },
 ];
 
-interface SidebarProps {
-  onNavigate?: () => void;
-}
-
-const Sidebar = ({ onNavigate }: SidebarProps) => {
+const Sidebar = ({ onNavigate }) => {
   return (
     <aside className={styles.sidebar}>
-      {/* Logo */}
       <div className={styles.brand}>
         <h2>Logo</h2>
       </div>
 
-
-
-      {/* Dashboard link on its own */}
       <nav className={styles.nav}>
         <NavLink
           to="/"
@@ -100,7 +96,6 @@ const Sidebar = ({ onNavigate }: SidebarProps) => {
         </div>
       </nav>
 
-      {/* Profile pinned to bottom */}
       <div className={styles.profile}>
         <img
           src="https://i.pravatar.cc/40"

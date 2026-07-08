@@ -1,22 +1,9 @@
 import styles from "./layout.module.css";
 
-interface HeaderProps {
-  onToggleSidebar: () => void;
-  title?: string;
-}
-
-const Header = ({ onToggleSidebar, title = "Dashboard" }: HeaderProps) => {
+const Header = ({ onToggleSidebar, title = "Dashboard" }) => {
   return (
     <header className={styles.header}>
       <div className={styles.headerLeft}>
-        {/* <button
-          type="button"
-          className={styles.iconBtn}
-          onClick={onToggleSidebar}
-          aria-label="Toggle sidebar"
-        >
-          <i className="bi bi-chevron-left" />
-        </button> */}
         <h3 className={styles.headerTitle}>{title}</h3>
       </div>
 

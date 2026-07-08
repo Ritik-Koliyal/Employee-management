@@ -1,32 +1,16 @@
 import { createSlice } from "@reduxjs/toolkit";
-import type { PayloadAction } from "@reduxjs/toolkit";
 
-interface Employee {
-  _id: string;
-  empID: string;
-  firstName: string;
-  role: string;
-}
-
-interface AuthState {
-  employee: Employee | null;
-  accessToken: string | null;
-  isAuthenticated: boolean;
-  isLoading: boolean
-}
-
-const initialState: AuthState = {
+const initialState = {
   employee: null,
   accessToken: null,
   isAuthenticated: false,
-  isLoading: false
+  isLoading: false,
 };
 
 const authSlice = createSlice({
   name: "auth",
   initialState,
   reducers: {
-
     authLoading(state) {
       state.isLoading = true;
     },
@@ -35,38 +19,30 @@ const authSlice = createSlice({
       state.isLoading = false;
     },
 
-    loginSuccess: (state, action: PayloadAction<{
-      employee: Employee,
-      accessToken: string
-    }>) => {
+    loginSuccess(state, action) {
       state.employee = action.payload.employee;
       state.accessToken = action.payload.accessToken;
-      state.isAuthenticated = true
+      state.isAuthenticated = true;
       state.isLoading = false;
     },
 
-    setAccessToken: (state, action: PayloadAction<string>) => {
+    setAccessToken(state, action) {
       state.accessToken = action.payload;
     },
 
-    setEmployee: (
-      state,
-      action: PayloadAction<Employee | null>
-    ) => {
-
+    setEmployee(state, action) {
       state.employee = action.payload;
-      state.isAuthenticated = true
-
+      state.isAuthenticated = true;
     },
 
-    logout: (state) => {
+    logout(state) {
       state.employee = null;
       state.accessToken = null;
       state.isAuthenticated = false;
       state.isLoading = false;
-    }
-  }
-})
+    },
+  },
+});
 
 export const {
   loginSuccess,
@@ -74,7 +50,7 @@ export const {
   setAccessToken,
   setEmployee,
   authFinished,
-  authLoading
+  authLoading,
 } = authSlice.actions;
 
 export default authSlice.reducer;
