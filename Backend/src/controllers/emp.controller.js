@@ -31,6 +31,7 @@ const createEmployee = async (req, res) => {
       department,
       designation,
       role,
+      aadharNumber,
     } = req.body;
 
     // Validation
@@ -85,6 +86,7 @@ const createEmployee = async (req, res) => {
       department,
       designation,
       role,
+      aadharNumber,
       password: hashedPassword,
       createdBy: req.user?._id || null,
     });

@@ -7,6 +7,7 @@ import Home from "./pages/Home.jsx";
 import MainLayout from "./layouts/MainLayout.jsx";
 import Registration from "./pages/Registration.jsx";
 import NotFound from "./pages/NotFound.jsx";
+import EmpRegistration from "./pages/registration/Emp-registration.jsx";
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<MainLayout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/registration" element={<Registration />} />
+            <Route path="/registration" element={<EmpRegistration />} />
             <Route path="*" element={<NotFound />} />
           </Route>
         </Route>

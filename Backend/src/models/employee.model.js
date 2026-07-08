@@ -147,6 +147,10 @@ const EmployeeSchema = new mongoose.Schema(
       enum: ["password", "google"],
       default: ["password"],
     },
+
+    aadharNumber: {
+      type: String,
+    },
   },
 
   {
